@@ -1,0 +1,76 @@
+---
+title: "ISLR 9.7.7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ISLR)
+library(e1071)
+set.seed(5082)
+```
+
+# Applied Exercise: ISLR 9.7.7
+
+##  (a). Create a binary variable that takes on a 1 for cars with gas mileage above the median, and a 0 for cars with gas mileage below the median.
+``` {r}
+dat <- Auto
+dat$y <- as.factor(ifelse(dat$mpg > median(dat$mpg), 1, 0))
+dat <- dat[,-1]
+```
+  
+## (b) Fit a support vector classifier to the data with various values of cost
+``` {r}
+set.seed(5082)
+svm1 <- tune(svm , y∼., data=dat, kernel = "linear", ranges=list(cost=c(0.1,1,10,100,1000)), 
+             tunecontrol = tune.control(sampling = "fix"))
+summary(svm1)
+svm1_best <- svm1$best.model
+```
+  
+We can see from the table above that cost = 1 with linear kernels gives the smallest cross-validated error
+    
+## (c) Now repeat (b), this time using SVMs with radial and polynomial basis kernels, with different values of gamma and degree and cost.  
+``` {r}
+set.seed(5082)
+svm2 <- tune(svm , y∼., data=dat, ranges=list(cost=c(0.1,1,10,100,1000), kernel = "radial",  gamma = c(0.5,1,2,3,4)), 
+             tunecontrol = tune.control(sampling = "fix"))
+summary(svm2)
+svm2_best <- svm2$best.model
+```
+  
+Cost = 10 and gamma = 0.5 with radial kernel gives a better cross-validated error.  
+  
+## continue (c) with polynomial kernel  
+``` {r}
+set.seed(5082)
+svm3 <- tune(svm , y∼., data=dat, ranges=list(cost=c(0.1,1,10,100,1000), kernel = "polynomial", gamma = c(0.5,1,2,3,4), 
+                                              degrees = c(2, 3, 4, 5)), tunecontrol = tune.control(sampling = "fix"))
+summary(svm3)
+svm3_best <- svm3$best.model
+```
+
+cost = 0.1 and gamma = 0.5 with a degree-2 polynomial kernel gives the best cross validated error, which is similar to radial and better than linear.  
+  
+## (d) Make some plots to back up your assertions in (b) and (c)  
+``` {r}
+plot(svm1_best, dat, weight~acceleration)
+plot(svm2_best, dat, weight~acceleration)
+plot(svm3_best, dat, weight~acceleration)
+```
+  
+Shape "x" means the points is a support vector (wrong side of the margin), and "o" means it does not affect the model. Colors mean different classes. We can see that radial kernel has a lot more support vectors than linear kernel. Maybe this is the reason why it outperforms linear kernel. We can also see that the boundary for polynomial kernel does not fit the actual boundary. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
