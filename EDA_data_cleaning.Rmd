@@ -1,0 +1,141 @@
+---
+title: "Team Project 2"
+author: "Team 22"
+date: "4/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+``` {r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+``` {r}
+# take a long time and require 8 Gigabyte of spare RAM.
+
+loan <- read.csv("loan.csv")
+
+
+```
+
+
+``` {r}
+colSums(is.na(loan))
+
+```
+
+
+``` {r}
+# delete any column that has more than 100000 NAs
+
+threshold = 0.3
+
+loan <- loan[, colSums(is.na(loan)) < nrow(loan) * threshold]
+
+```
+
+
+``` {r}
+colSums(is.na(loan))
+```
+
+
+``` {r}
+loan <- na.omit(loan )
+colSums(is.na(loan))
+```
+
+### add a target variable on loan status, that divide 10 loan status into 2 category, making it a binary variable
+
+``` {r}
+#unique(loan$loan_status)
+
+table(loan$loan_status)
+barplot(table(loan$loan_status))
+
+
+loan$target <- as.factor(ifelse(loan$loan_status %in% c("Charged Off",
+                    "Default",
+                    "Does not meet the credit policy. Status:Charged Off",
+                    "In Grace Period", 
+                    "Default Receiver", 
+                    "Late (16-30 days)",
+                    "Late (31-120 days)"), 0, ifelse(loan$loan_status %in% c("Fully Paid"), 1, 2)))
+table(loan$target)
+
+```
+
+### filter out loans that are still "current", which corresponds to target = 2
+
+``` {r}
+cleaned_loan <- loan %>% filter(target != 2)
+table(cleaned_loan$target)
+
+```
+
+### test the baseline of predicting all 1 and using the provided grade column
+
+``` {r}
+cleaned_loan$target <- factor(cleaned_loan$target)
+(baseline_grade <- table(cleaned_loan$grade, cleaned_loan$target))
+
+```
+
+``` {r}
+(all_1_acc <- nrow(cleaned_loan[which(as.integer(cleaned_loan$target) != 1),])/nrow(cleaned_loan))
+(all_1_type2err <- 1)
+
+(grade_acc <- sum(baseline_grade[c("A", "B", "C"),2])/sum(baseline_grade))
+(grade_type2err <- sum(baseline_grade[c("D", "E", "F", "G"), 1])/sum(baseline_grade[, 1]))
+
+
+
+```
+  
+Predicting all 1 results in an accuracy of 0.7734 and a Type 2 error of 1. We cannot predict any of the default.  
+Using the provided grade column as indicator we manage to get a accuracy of 0.61 while predicting 43% out of all defaults. Noted that we can change the threshold for grade to adjust the trade-off.  
+    
+Our purpose is to develop a model that can minimize type 2 error, which in other words mean we want to be able to predict as many bad loans as possible, while maintaing a resonable level of accuracy.
+
+Now we proceed to filter out variables that are unsuable such as the employee title because everyone has his or her own unique employee title, and hardship-related variables since there is no way we would know those when the loan originates.  
+
+``` {r}
+colnames(cleaned_loan)
+
+```
+
+``` {r}
+usable_variables <- c("loan_amnt", "funded_amnt", "term", "int_rate", "installment", "emp_length", "home_ownership",
+                        "annual_inc", "verification_status", "pymnt_plan", "purpose", "dti", "delinq_2yrs", 
+                        "inq_last_6mths", "open_acc", "pub_rec", "revol_bal", "revol_util", "total_acc", 
+                        "initial_list_status", "tot_coll_amt", "acc_now_delinq", "delinq_amnt", "tot_cur_bal", 
+                        "avg_cur_bal", "collections_12_mths_ex_med", "chargeoff_within_12_mths", "bc_open_to_buy", 
+                        "bc_util", "acc_open_past_24mths", "mo_sin_old_il_acct", "mo_sin_old_rev_tl_op", 
+                        "mo_sin_rcnt_rev_tl_op", "mo_sin_rcnt_tl", "mths_since_recent_bc", "mths_since_recent_inq", 
+                        "num_accts_ever_120_pd", "num_actv_bc_tl", "num_actv_rev_tl", "num_bc_sats", "num_bc_tl", 
+                        "num_il_tl", "num_op_rev_tl", "num_rev_accts", "num_rev_tl_bal_gt_0", "num_sats", 
+                        "num_tl_120dpd_2m", "num_tl_30dpd", "num_tl_90g_dpd_24m", "num_tl_op_past_12m", "pct_tl_nvr_dlq", 
+                        "percent_bc_gt_75", "pub_rec_bankruptcies", "tax_liens", "tot_hi_cred_lim", "total_bal_ex_mort", 
+                        "total_bc_limit", "total_il_high_credit_limit", "disbursement_method", "target")
+
+cleaned_loan_2 <- cleaned_loan[,colnames(cleaned_loan) %in% usable_variables]
+```
+
+``` {r}
+head(cleaned_loan_2)
+
+```
+
+### export the cleaned version of our data to a csv file and run model on it.
+
+```{r}
+
+write.csv(cleaned_loan_2, "cleaned_loan.csv")
+```
+
+

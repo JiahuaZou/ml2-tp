@@ -1,0 +1,95 @@
+---
+title: "Random Forest"
+author: "Team 22"
+date: "4/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(randomForest)
+```
+
+
+``` {r}
+
+cleaned_loan <- read.csv("cleaned_loan.csv")
+#head(cleaned_loan)
+
+```
+
+
+```{r}
+
+trainprop <- 0.01
+size <- nrow(cleaned_loan)
+
+```
+
+```{r}
+set.seed(5082)
+train_ind <- sample(1:size, trainprop * size)
+test_ind <- sample(setdiff(1:size, train_ind), trainprop * size)
+#test_ind <- setdiff(1:size, train_ind)
+train_df <- cleaned_loan[train_ind,]
+test_df <- cleaned_loan[test_ind,]
+```
+
+``` {r}
+nrow(train_df)
+```
+
+
+``` {r}
+train_df$target <- as.factor(train_df$target)
+rf_model <- randomForest(target~., data = train_df, 
+                          ntree = 250, replace = TRUE, importance = TRUE)
+rf_model$importance
+
+# (2) Use the bagging model to make predictions on the test set
+
+yhat_rf <- predict(rf_model, newdata = test_df)
+
+
+# (4) Produce the confusion matrix and error rate of the bagging results
+
+(rf_table <- table(test_df$target, yhat_rf))
+#(rf_table[1,2]+rf_table[2,1])/sum(rf_table)
+```
+
+``` {r}
+# accuracy
+(rf_table[1,1]+rf_table[2,2])/sum(rf_table)
+
+# 1 - type 2 error
+rf_table[1,1]/sum(rf_table[1,])
+
+```
+
+```{r}
+sum(rf_table[1,])
+table(test_df$target)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,158 @@
+---
+title: "modeling"
+author: "Team 22"
+date: "4/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+``` {r}
+library(glmnet)
+```
+
+``` {r}
+
+cleaned_loan <- read.csv("cleaned_loan.csv")
+#head(cleaned_loan)
+
+```
+
+
+
+
+
+
+```{r}
+
+trainprop <- 0.6
+size <- nrow(cleaned_loan)
+
+```
+
+```{r}
+set.seed(5082)
+train_ind <- sample(1:size, trainprop * size)
+#test_ind <- sample(setdiff(1:size, train_ind), trainprop * size)
+test_ind <- setdiff(1:size, train_ind)
+train_df <- cleaned_loan[train_ind,]
+test_df <- cleaned_loan[test_ind,]
+```
+
+``` {r}
+nrow(train_df)
+```
+
+``` {r}
+colnames(train_df)
+
+```
+
+``` {r}
+glm.fit <- glm(target~., family = "binomial", data = train_df)
+summary(glm.fit)
+
+```
+  
+
+```{r}
+glm.pred <- rep(0, nrow(test_df))
+glm.pred[predict(glm.fit,type='response', newdata = test_df) > .72] <- 1
+
+# confusion matrix
+(glm.table <- table(test_df$target, glm.pred))
+
+# accuracy
+(glm.table[1,1]+glm.table[2,2])/sum(glm.table)
+
+# 1 - type 2 error
+glm.table[1,1]/sum(glm.table[1,])
+```
+  
+```{r}
+glm.train <- rep(0, nrow(train_df))
+glm.train[predict(glm.fit,type='response', newdata = train_df) > .72] <- 1
+
+# confusion matrix
+(glm.table_train <- table(train_df$target, glm.train))
+
+# accuracy
+(glm.table_train[1,1]+glm.table_train[2,2])/sum(glm.table_train)
+
+# 1 - type 2 error
+glm.table_train[1,1]/sum(glm.table_train[1,])
+
+```
+  
+  
+```{r}
+lambda_seq <- 10^seq(2, -2, by = -.1)
+lasso.fit <- cv.glmnet(x = data.matrix(train_df[,-which(names(train_df) %in% c("target"))]), 
+                       y = data.matrix(train_df[,"target"]), family = "binomial", alpha = 1, lambda = lambda_seq, 
+                       nfolds = 5)
+
+# summary(lasso.fit)
+```
+
+```{r}
+
+plot(lasso.fit)
+
+print(paste("best lambda value is", as.character(lasso.fit$lambda.min)))
+
+best_lambda <- lasso.fit$lambda.min
+```
+
+
+### fit a lasso model with the best lambda value of 0.01
+```{r}
+
+mod.lasso <- glmnet(x = data.matrix(train_df[,-which(names(train_df) %in% c("target"))]),
+                    y = data.matrix(train_df[,"target"]), family = "binomial", alpha = 1, lambda = best_lambda)
+
+```
+
+```{r}
+lasso.pred <- rep(0, nrow(test_df))
+lasso.pred[predict(mod.lasso, newx = data.matrix(test_df[,-which(names(test_df) %in% c("target"))]), 
+                          family = "binomial", type = "response") > 0.72] <- 1
+# confusion matrix
+(conf_mat_lasso <- table(test_df$target, lasso.pred))
+
+# accuracy
+(conf_mat_lasso[1,1]+conf_mat_lasso[2,2])/sum(conf_mat_lasso)
+
+# 1 - type 2 error
+conf_mat_lasso[1,1]/sum(conf_mat_lasso[1,])
+
+```
+  
+The model performs slightly worse than our plain-vanilla logistic regression model. I suspect that is because overfitting is not a problem here in our model, so regularization is unnecessary.  
+
+``` {r}
+lasso.train <- rep(0, nrow(train_df))
+lasso.train[predict(mod.lasso, newx = data.matrix(train_df[,-which(names(train_df) %in% c("target"))]), 
+                          family = "binomial", type = "response") > 0.72] <- 1
+# confusion matrix
+(conf_mat_lasso_train <- table(train_df$target, lasso.train))
+
+# accuracy
+(conf_mat_lasso_train[1,1]+conf_mat_lasso_train[2,2])/sum(conf_mat_lasso_train)
+
+# 1 - type 2 error
+conf_mat_lasso_train[1,1]/sum(conf_mat_lasso_train[1,])
+
+```
+
+
+
+```{r}
+table(test_df$target)
+
+#predict.glmnet()
+```
+
+
+
