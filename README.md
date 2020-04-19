@@ -1,5 +1,8 @@
 # ml2-tp1: Support Vector Machine
 ## Team 22: Ty Klaus, Julian Ngoh, Esa Sun, Jerry Zou
+    
+[visit our github repository to download code](https://github.com/JiahuaZou/ml2-tp1)
+    
 Project Code for Team Presentation 1 of BUAD5082 - Machine Learning 2
   
 [lab 9.6.1](9-6-1.html)
