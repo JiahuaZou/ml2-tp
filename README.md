@@ -1,4 +1,4 @@
-# ml2-tp1
+# ml2-tp1: Support Vector Machine
 ## Team 22: Ty Klaus, Julian Ngoh, Esa Sun, Jerry Zou
 Project Code for Team Presentation 1 of BUAD5082 - Machine Learning 2
   
@@ -11,5 +11,11 @@ Project Code for Team Presentation 1 of BUAD5082 - Machine Learning 2
     
 # ml2-tp2: Lending Club Bad Loan Prediction
 Project Code for Team Presentation 2 of BUAD5082 - Machine Learning 2   
+
+[data source](https://www.kaggle.com/wendykan/lending-club-loan-data)
     
-[data cleaning and exploratory data analysis]
+[data cleaning and exploratory data analysis](EDA_data_cleaning.html)
+    
+[logistic regression and lasso regresison](modeling.html)
+    
+[random forest model](random_forest.html)
