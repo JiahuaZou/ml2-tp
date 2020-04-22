@@ -46,9 +46,11 @@ nrow(train_df)
 
 ``` {r}
 train_df$target <- as.factor(train_df$target)
-rf_model <- randomForest(target~., data = train_df, 
+rf_model <- randomForest(target~.-X, data = train_df, 
                           ntree = 250, replace = TRUE, importance = TRUE)
-rf_model$importance
+importance(rf_model)
+
+varImpPlot(rf_model)
 
 # (2) Use the bagging model to make predictions on the test set
 
