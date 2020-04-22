@@ -375,7 +375,7 @@ summary {
 <pre><code>## Loaded glmnet 3.0-2</code></pre>
 <pre class="r"><code>cleaned_loan &lt;- read.csv(&quot;cleaned_loan.csv&quot;)
 #head(cleaned_loan)</code></pre>
-<pre class="r"><code>trainprop &lt;- 0.6
+<pre class="r"><code>trainprop &lt;- 0.8
 size &lt;- nrow(cleaned_loan)</code></pre>
 <pre class="r"><code>set.seed(5082)
 train_ind &lt;- sample(1:size, trainprop * size)
@@ -384,7 +384,7 @@ test_ind &lt;- setdiff(1:size, train_ind)
 train_df &lt;- cleaned_loan[train_ind,]
 test_df &lt;- cleaned_loan[test_ind,]</code></pre>
 <pre class="r"><code>nrow(train_df)</code></pre>
-<pre><code>## [1] 634321</code></pre>
+<pre><code>## [1] 845762</code></pre>
 <pre class="r"><code>colnames(train_df)</code></pre>
 <pre><code>##  [1] &quot;X&quot;                          &quot;loan_amnt&quot;                 
 ##  [3] &quot;funded_amnt&quot;                &quot;term&quot;                      
@@ -417,114 +417,113 @@ test_df &lt;- cleaned_loan[test_ind,]</code></pre>
 ## [57] &quot;total_bal_ex_mort&quot;          &quot;total_bc_limit&quot;            
 ## [59] &quot;total_il_high_credit_limit&quot; &quot;disbursement_method&quot;       
 ## [61] &quot;target&quot;</code></pre>
-<pre class="r"><code>glm.fit &lt;- glm(target~., family = &quot;binomial&quot;, data = train_df)
-summary(glm.fit)</code></pre>
+<pre class="r"><code>glm.fit &lt;- glm(target~.-X, family = &quot;binomial&quot;, data = train_df)</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summary(glm.fit)</code></pre>
 <pre><code>## 
 ## Call:
-## glm(formula = target ~ ., family = &quot;binomial&quot;, data = train_df)
+## glm(formula = target ~ . - X, family = &quot;binomial&quot;, data = train_df)
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.9668   0.3183   0.5411   0.7209   5.2996  
+## -3.6515   0.3247   0.5454   0.7228   5.5332  
 ## 
 ## Coefficients:
 ##                                      Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)                         2.385e+00  2.208e-01  10.801  &lt; 2e-16
-## X                                   5.198e-07  1.112e-08  46.762  &lt; 2e-16
-## loan_amnt                           5.026e-01  9.112e+00   0.055 0.956012
-## funded_amnt                        -5.026e-01  9.112e+00  -0.055 0.956011
-## term 60 months                     -6.057e-01  1.781e-02 -33.999  &lt; 2e-16
-## int_rate                           -7.233e-02  1.104e-03 -65.521  &lt; 2e-16
-## installment                        -1.066e-04  8.145e-05  -1.309 0.190552
-## emp_length1 year                    4.053e-02  1.656e-02   2.448 0.014378
-## emp_length10+ years                 8.715e-02  1.281e-02   6.803 1.02e-11
-## emp_length2 years                   7.375e-02  1.533e-02   4.811 1.50e-06
-## emp_length3 years                   4.208e-02  1.578e-02   2.667 0.007661
-## emp_length4 years                   6.677e-02  1.720e-02   3.882 0.000104
-## emp_length5 years                   7.851e-02  1.704e-02   4.608 4.06e-06
-## emp_length6 years                   9.192e-02  1.867e-02   4.923 8.54e-07
-## emp_length7 years                   8.905e-02  1.899e-02   4.689 2.75e-06
-## emp_length8 years                   6.175e-02  1.866e-02   3.309 0.000936
-## emp_length9 years                   6.628e-02  1.991e-02   3.330 0.000869
-## emp_lengthn/a                      -4.401e-01  1.738e-02 -25.321  &lt; 2e-16
-## home_ownershipMORTGAGE              2.366e-01  2.100e-01   1.127 0.259811
-## home_ownershipNONE                  1.234e+00  7.949e-01   1.553 0.120441
-## home_ownershipOTHER                -4.038e-02  5.286e-01  -0.076 0.939110
-## home_ownershipOWN                   1.114e-01  2.101e-01   0.530 0.595885
-## home_ownershipRENT                 -2.202e-02  2.100e-01  -0.105 0.916488
-## annual_inc                          5.845e-07  9.720e-08   6.013 1.82e-09
-## verification_statusSource Verified -1.281e-01  8.349e-03 -15.338  &lt; 2e-16
-## verification_statusVerified        -5.794e-02  9.130e-03  -6.347 2.20e-10
-## pymnt_plany                        -1.362e+01  1.664e+01  -0.819 0.412975
-## purposecredit_card                 -5.556e-02  3.678e-02  -1.511 0.130880
-## purposedebt_consolidation          -1.077e-01  3.625e-02  -2.972 0.002961
-## purposeeducational                  1.134e+01  3.247e+02   0.035 0.972142
-## purposehome_improvement            -2.162e-01  3.823e-02  -5.657 1.54e-08
-## purposehouse                       -7.285e-02  5.495e-02  -1.326 0.184888
-## purposemajor_purchase              -2.294e-01  4.223e-02  -5.433 5.56e-08
-## purposemedical                     -3.393e-01  4.597e-02  -7.381 1.57e-13
-## purposemoving                      -2.973e-01  5.104e-02  -5.825 5.70e-09
-## purposeother                       -2.273e-01  3.825e-02  -5.941 2.83e-09
-## purposerenewable_energy            -1.454e-01  1.296e-01  -1.122 0.261981
-## purposesmall_business              -5.494e-01  4.581e-02 -11.994  &lt; 2e-16
-## purposevacation                    -2.304e-01  5.301e-02  -4.346 1.38e-05
-## purposewedding                      3.928e-01  1.436e-01   2.735 0.006230
-## dti                                -1.328e-02  4.534e-04 -29.287  &lt; 2e-16
-## delinq_2yrs                        -1.066e-01  5.174e-03 -20.611  &lt; 2e-16
-## inq_last_6mths                     -1.493e-02  4.201e-03  -3.554 0.000380
-## open_acc                            4.197e-02  1.739e-02   2.413 0.015816
-## pub_rec                             2.344e-04  1.434e-02   0.016 0.986957
-## revol_bal                           4.295e-06  4.549e-07   9.440  &lt; 2e-16
-## revol_util                         -1.845e-03  2.874e-04  -6.420 1.36e-10
-## total_acc                           4.362e-02  2.076e-03  21.015  &lt; 2e-16
-## initial_list_statusw               -9.894e-02  6.970e-03 -14.195  &lt; 2e-16
-## collections_12_mths_ex_med         -2.116e-01  2.076e-02 -10.195  &lt; 2e-16
-## acc_now_delinq                      3.531e-02  9.213e-02   0.383 0.701548
-## tot_coll_amt                        3.446e-07  4.183e-07   0.824 0.410046
-## tot_cur_bal                        -2.998e-07  2.081e-07  -1.441 0.149570
-## acc_open_past_24mths               -4.322e-02  1.624e-03 -26.611  &lt; 2e-16
-## avg_cur_bal                         4.403e-06  5.862e-07   7.510 5.93e-14
-## bc_open_to_buy                      7.914e-08  7.819e-07   0.101 0.919381
-## bc_util                             1.579e-03  3.025e-04   5.219 1.80e-07
-## chargeoff_within_12_mths           -5.877e-02  2.935e-02  -2.002 0.045288
-## delinq_amnt                        -5.516e-06  4.390e-06  -1.256 0.208977
-## mo_sin_old_il_acct                  3.870e-05  6.874e-05   0.563 0.573405
-## mo_sin_old_rev_tl_op                3.263e-04  4.219e-05   7.734 1.04e-14
-## mo_sin_rcnt_rev_tl_op              -8.977e-04  3.379e-04  -2.657 0.007882
-## mo_sin_rcnt_tl                      2.274e-03  6.645e-04   3.423 0.000620
-## mths_since_recent_bc                1.473e-03  1.540e-04   9.566  &lt; 2e-16
-## mths_since_recent_inq               8.618e-03  6.979e-04  12.350  &lt; 2e-16
-## num_accts_ever_120_pd              -4.432e-03  3.126e-03  -1.418 0.156295
-## num_actv_bc_tl                     -1.039e-02  4.730e-03  -2.197 0.027991
-## num_actv_rev_tl                    -1.718e-02  1.984e-02  -0.866 0.386576
-## num_bc_sats                        -8.109e-03  4.545e-03  -1.784 0.074416
-## num_bc_tl                           5.873e-04  2.067e-03   0.284 0.776286
-## num_il_tl                          -3.679e-02  2.168e-03 -16.970  &lt; 2e-16
-## num_op_rev_tl                       5.407e-03  3.037e-03   1.781 0.074989
-## num_rev_accts                      -3.166e-02  2.581e-03 -12.264  &lt; 2e-16
-## num_rev_tl_bal_gt_0                -2.146e-02  1.976e-02  -1.086 0.277486
-## num_sats                           -4.180e-02  1.736e-02  -2.408 0.016049
-## num_tl_120dpd_2m                   -1.645e-01  1.377e-01  -1.195 0.232239
-## num_tl_30dpd                       -1.194e-01  1.053e-01  -1.134 0.256797
-## num_tl_90g_dpd_24m                  7.379e-02  8.930e-03   8.263  &lt; 2e-16
-## num_tl_op_past_12m                 -3.628e-03  2.702e-03  -1.343 0.179398
-## pct_tl_nvr_dlq                      2.949e-03  5.413e-04   5.447 5.11e-08
-## percent_bc_gt_75                   -2.052e-03  1.692e-04 -12.130  &lt; 2e-16
-## pub_rec_bankruptcies               -5.613e-02  1.640e-02  -3.423 0.000620
-## tax_liens                          -2.410e-02  1.611e-02  -1.496 0.134690
-## tot_hi_cred_lim                     4.986e-07  1.880e-07   2.652 0.007992
-## total_bal_ex_mort                  -3.912e-06  3.454e-07 -11.326  &lt; 2e-16
-## total_bc_limit                      6.368e-06  5.628e-07  11.316  &lt; 2e-16
-## total_il_high_credit_limit          4.020e-06  3.478e-07  11.557  &lt; 2e-16
-## disbursement_methodDirectPay       -1.352e-01  3.991e-02  -3.386 0.000708
+## (Intercept)                         2.460e+00  1.933e-01  12.727  &lt; 2e-16
+## loan_amnt                           3.409e-01  1.178e+00   0.290 0.772173
+## funded_amnt                        -3.410e-01  1.178e+00  -0.290 0.772163
+## term 60 months                     -6.007e-01  1.538e-02 -39.047  &lt; 2e-16
+## int_rate                           -7.081e-02  9.547e-04 -74.173  &lt; 2e-16
+## installment                        -1.717e-04  7.035e-05  -2.441 0.014637
+## emp_length1 year                    2.811e-02  1.428e-02   1.968 0.049021
+## emp_length10+ years                 8.180e-02  1.105e-02   7.402 1.34e-13
+## emp_length2 years                   7.367e-02  1.325e-02   5.562 2.66e-08
+## emp_length3 years                   3.923e-02  1.362e-02   2.879 0.003984
+## emp_length4 years                   6.891e-02  1.483e-02   4.645 3.39e-06
+## emp_length5 years                   8.078e-02  1.471e-02   5.493 3.96e-08
+## emp_length6 years                   8.752e-02  1.609e-02   5.440 5.32e-08
+## emp_length7 years                   1.071e-01  1.638e-02   6.537 6.29e-11
+## emp_length8 years                   6.530e-02  1.615e-02   4.044 5.26e-05
+## emp_length9 years                   6.229e-02  1.718e-02   3.626 0.000288
+## emp_lengthn/a                      -4.551e-01  1.502e-02 -30.297  &lt; 2e-16
+## home_ownershipMORTGAGE              2.959e-01  1.842e-01   1.607 0.108155
+## home_ownershipNONE                  1.191e+00  6.571e-01   1.813 0.069892
+## home_ownershipOTHER                 1.466e-01  4.836e-01   0.303 0.761804
+## home_ownershipOWN                   1.578e-01  1.843e-01   0.856 0.391846
+## home_ownershipRENT                  3.618e-02  1.842e-01   0.196 0.844292
+## annual_inc                          4.195e-07  7.824e-08   5.362 8.24e-08
+## verification_statusSource Verified -1.313e-01  7.205e-03 -18.222  &lt; 2e-16
+## verification_statusVerified        -5.730e-02  7.880e-03  -7.272 3.54e-13
+## pymnt_plany                        -1.460e+01  2.370e+01  -0.616 0.537719
+## purposecredit_card                 -1.962e-02  3.154e-02  -0.622 0.533822
+## purposedebt_consolidation          -6.926e-02  3.108e-02  -2.228 0.025869
+## purposeeducational                  1.227e+01  5.354e+02   0.023 0.981721
+## purposehome_improvement            -1.786e-01  3.281e-02  -5.444 5.22e-08
+## purposehouse                       -6.118e-02  4.735e-02  -1.292 0.196329
+## purposemajor_purchase              -1.870e-01  3.632e-02  -5.150 2.60e-07
+## purposemedical                     -3.186e-01  3.956e-02  -8.055 7.95e-16
+## purposemoving                      -2.501e-01  4.421e-02  -5.657 1.54e-08
+## purposeother                       -1.932e-01  3.284e-02  -5.884 4.01e-09
+## purposerenewable_energy            -1.498e-01  1.123e-01  -1.334 0.182271
+## purposesmall_business              -5.131e-01  3.940e-02 -13.024  &lt; 2e-16
+## purposevacation                    -2.112e-01  4.570e-02  -4.621 3.82e-06
+## purposewedding                      5.095e-01  1.228e-01   4.150 3.32e-05
+## dti                                -1.451e-02  3.894e-04 -37.257  &lt; 2e-16
+## delinq_2yrs                        -1.019e-01  4.464e-03 -22.836  &lt; 2e-16
+## inq_last_6mths                      6.020e-03  3.608e-03   1.669 0.095200
+## open_acc                            4.159e-02  1.502e-02   2.769 0.005622
+## pub_rec                            -3.496e-02  1.227e-02  -2.850 0.004378
+## revol_bal                           4.867e-06  3.720e-07  13.085  &lt; 2e-16
+## revol_util                         -1.420e-03  2.467e-04  -5.758 8.51e-09
+## total_acc                           4.765e-02  1.788e-03  26.652  &lt; 2e-16
+## initial_list_statusw               -1.582e-01  5.893e-03 -26.852  &lt; 2e-16
+## collections_12_mths_ex_med         -2.045e-01  1.794e-02 -11.399  &lt; 2e-16
+## acc_now_delinq                      1.284e-02  7.004e-02   0.183 0.854585
+## tot_coll_amt                        3.787e-07  4.224e-07   0.896 0.370004
+## tot_cur_bal                         1.366e-07  1.336e-07   1.023 0.306380
+## acc_open_past_24mths               -4.738e-02  1.401e-03 -33.831  &lt; 2e-16
+## avg_cur_bal                         4.157e-06  5.054e-07   8.224  &lt; 2e-16
+## bc_open_to_buy                      9.535e-07  6.606e-07   1.443 0.148908
+## bc_util                             1.680e-03  2.605e-04   6.451 1.11e-10
+## chargeoff_within_12_mths           -5.975e-02  2.514e-02  -2.377 0.017454
+## delinq_amnt                        -8.728e-06  3.680e-06  -2.372 0.017716
+## mo_sin_old_il_acct                  2.553e-05  5.940e-05   0.430 0.667384
+## mo_sin_old_rev_tl_op                3.575e-04  3.642e-05   9.819  &lt; 2e-16
+## mo_sin_rcnt_rev_tl_op              -1.066e-03  2.915e-04  -3.655 0.000257
+## mo_sin_rcnt_tl                      2.169e-03  5.734e-04   3.783 0.000155
+## mths_since_recent_bc                1.578e-03  1.337e-04  11.809  &lt; 2e-16
+## mths_since_recent_inq               1.038e-02  6.034e-04  17.195  &lt; 2e-16
+## num_accts_ever_120_pd              -6.008e-03  2.694e-03  -2.230 0.025740
+## num_actv_bc_tl                     -9.981e-03  4.079e-03  -2.447 0.014395
+## num_actv_rev_tl                     1.069e-02  1.704e-02   0.628 0.530258
+## num_bc_sats                        -1.605e-02  3.918e-03  -4.098 4.17e-05
+## num_bc_tl                           8.389e-03  1.781e-03   4.710 2.48e-06
+## num_il_tl                          -4.067e-02  1.867e-03 -21.786  &lt; 2e-16
+## num_op_rev_tl                       9.161e-03  2.620e-03   3.496 0.000472
+## num_rev_accts                      -3.789e-02  2.223e-03 -17.041  &lt; 2e-16
+## num_rev_tl_bal_gt_0                -4.838e-02  1.697e-02  -2.851 0.004360
+## num_sats                           -4.078e-02  1.499e-02  -2.720 0.006535
+## num_tl_120dpd_2m                   -9.345e-02  1.150e-01  -0.812 0.416557
+## num_tl_30dpd                       -1.384e-01  8.230e-02  -1.681 0.092720
+## num_tl_90g_dpd_24m                  6.720e-02  7.622e-03   8.817  &lt; 2e-16
+## num_tl_op_past_12m                 -7.983e-03  2.328e-03  -3.428 0.000607
+## pct_tl_nvr_dlq                      4.001e-03  4.669e-04   8.569  &lt; 2e-16
+## percent_bc_gt_75                   -1.968e-03  1.461e-04 -13.475  &lt; 2e-16
+## pub_rec_bankruptcies               -3.342e-02  1.406e-02  -2.377 0.017437
+## tax_liens                           3.227e-03  1.386e-02   0.233 0.815902
+## tot_hi_cred_lim                     9.834e-08  1.152e-07   0.854 0.393204
+## total_bal_ex_mort                  -4.454e-06  2.782e-07 -16.007  &lt; 2e-16
+## total_bc_limit                      5.648e-06  4.849e-07  11.649  &lt; 2e-16
+## total_il_high_credit_limit          4.481e-06  2.818e-07  15.902  &lt; 2e-16
+## disbursement_methodDirectPay       -2.869e-01  3.437e-02  -8.348  &lt; 2e-16
 ##                                       
 ## (Intercept)                        ***
-## X                                  ***
 ## loan_amnt                             
 ## funded_amnt                           
 ## term 60 months                     ***
 ## int_rate                           ***
-## installment                           
+## installment                        *  
 ## emp_length1 year                   *  
 ## emp_length10+ years                ***
 ## emp_length2 years                  ***
@@ -537,7 +536,7 @@ summary(glm.fit)</code></pre>
 ## emp_length9 years                  ***
 ## emp_lengthn/a                      ***
 ## home_ownershipMORTGAGE                
-## home_ownershipNONE                    
+## home_ownershipNONE                 .  
 ## home_ownershipOTHER                   
 ## home_ownershipOWN                     
 ## home_ownershipRENT                    
@@ -546,7 +545,7 @@ summary(glm.fit)</code></pre>
 ## verification_statusVerified        ***
 ## pymnt_plany                           
 ## purposecredit_card                    
-## purposedebt_consolidation          ** 
+## purposedebt_consolidation          *  
 ## purposeeducational                    
 ## purposehome_improvement            ***
 ## purposehouse                          
@@ -557,12 +556,12 @@ summary(glm.fit)</code></pre>
 ## purposerenewable_energy               
 ## purposesmall_business              ***
 ## purposevacation                    ***
-## purposewedding                     ** 
+## purposewedding                     ***
 ## dti                                ***
 ## delinq_2yrs                        ***
-## inq_last_6mths                     ***
-## open_acc                           *  
-## pub_rec                               
+## inq_last_6mths                     .  
+## open_acc                           ** 
+## pub_rec                            ** 
 ## revol_bal                          ***
 ## revol_util                         ***
 ## total_acc                          ***
@@ -576,32 +575,32 @@ summary(glm.fit)</code></pre>
 ## bc_open_to_buy                        
 ## bc_util                            ***
 ## chargeoff_within_12_mths           *  
-## delinq_amnt                           
+## delinq_amnt                        *  
 ## mo_sin_old_il_acct                    
 ## mo_sin_old_rev_tl_op               ***
-## mo_sin_rcnt_rev_tl_op              ** 
+## mo_sin_rcnt_rev_tl_op              ***
 ## mo_sin_rcnt_tl                     ***
 ## mths_since_recent_bc               ***
 ## mths_since_recent_inq              ***
-## num_accts_ever_120_pd                 
+## num_accts_ever_120_pd              *  
 ## num_actv_bc_tl                     *  
 ## num_actv_rev_tl                       
-## num_bc_sats                        .  
-## num_bc_tl                             
+## num_bc_sats                        ***
+## num_bc_tl                          ***
 ## num_il_tl                          ***
-## num_op_rev_tl                      .  
+## num_op_rev_tl                      ***
 ## num_rev_accts                      ***
-## num_rev_tl_bal_gt_0                   
-## num_sats                           *  
+## num_rev_tl_bal_gt_0                ** 
+## num_sats                           ** 
 ## num_tl_120dpd_2m                      
-## num_tl_30dpd                          
+## num_tl_30dpd                       .  
 ## num_tl_90g_dpd_24m                 ***
-## num_tl_op_past_12m                    
+## num_tl_op_past_12m                 ***
 ## pct_tl_nvr_dlq                     ***
 ## percent_bc_gt_75                   ***
-## pub_rec_bankruptcies               ***
+## pub_rec_bankruptcies               *  
 ## tax_liens                             
-## tot_hi_cred_lim                    ** 
+## tot_hi_cred_lim                       
 ## total_bal_ex_mort                  ***
 ## total_bc_limit                     ***
 ## total_il_high_credit_limit         ***
@@ -611,11 +610,11 @@ summary(glm.fit)</code></pre>
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 677963  on 634320  degrees of freedom
-## Residual deviance: 609795  on 634233  degrees of freedom
-## AIC: 609971
+##     Null deviance: 905043  on 845761  degrees of freedom
+## Residual deviance: 817073  on 845675  degrees of freedom
+## AIC: 817247
 ## 
-## Number of Fisher Scoring iterations: 11</code></pre>
+## Number of Fisher Scoring iterations: 12</code></pre>
 <pre class="r"><code>glm.pred &lt;- rep(0, nrow(test_df))
 glm.pred[predict(glm.fit,type=&#39;response&#39;, newdata = test_df) &gt; .72] &lt;- 1
 
@@ -623,14 +622,14 @@ glm.pred[predict(glm.fit,type=&#39;response&#39;, newdata = test_df) &gt; .72] &
 (glm.table &lt;- table(test_df$target, glm.pred))</code></pre>
 <pre><code>##    glm.pred
 ##          0      1
-##   0  48134  48042
-##   1  68589 258117</code></pre>
+##   0  23796  24150
+##   1  34429 129066</code></pre>
 <pre class="r"><code># accuracy
 (glm.table[1,1]+glm.table[2,2])/sum(glm.table)</code></pre>
-<pre><code>## [1] 0.7241997</code></pre>
+<pre><code>## [1] 0.7229534</code></pre>
 <pre class="r"><code># 1 - type 2 error
 glm.table[1,1]/sum(glm.table[1,])</code></pre>
-<pre><code>## [1] 0.5004783</code></pre>
+<pre><code>## [1] 0.4963083</code></pre>
 <pre class="r"><code>glm.train &lt;- rep(0, nrow(train_df))
 glm.train[predict(glm.fit,type=&#39;response&#39;, newdata = train_df) &gt; .72] &lt;- 1
 
@@ -638,14 +637,14 @@ glm.train[predict(glm.fit,type=&#39;response&#39;, newdata = train_df) &gt; .72]
 (glm.table_train &lt;- table(train_df$target, glm.train))</code></pre>
 <pre><code>##    glm.train
 ##          0      1
-##   0  72177  71181
-##   1 103388 387575</code></pre>
+##   0  95366  96222
+##   1 138972 515202</code></pre>
 <pre class="r"><code># accuracy
 (glm.table_train[1,1]+glm.table_train[2,2])/sum(glm.table_train)</code></pre>
-<pre><code>## [1] 0.7247939</code></pre>
+<pre><code>## [1] 0.7219147</code></pre>
 <pre class="r"><code># 1 - type 2 error
 glm.table_train[1,1]/sum(glm.table_train[1,])</code></pre>
-<pre><code>## [1] 0.5034738</code></pre>
+<pre><code>## [1] 0.497766</code></pre>
 <pre class="r"><code>lambda_seq &lt;- 10^seq(2, -2, by = -.1)
 lasso.fit &lt;- cv.glmnet(x = data.matrix(train_df[,-which(names(train_df) %in% c(&quot;target&quot;))]), 
                        y = data.matrix(train_df[,&quot;target&quot;]), family = &quot;binomial&quot;, alpha = 1, lambda = lambda_seq, 
@@ -653,7 +652,7 @@ lasso.fit &lt;- cv.glmnet(x = data.matrix(train_df[,-which(names(train_df) %in% 
 
 # summary(lasso.fit)</code></pre>
 <pre class="r"><code>plot(lasso.fit)</code></pre>
-<p><img src="data:image/png;base64,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" width="672" /></p>
+<p><img src="data:image/png;base64,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" width="672" /></p>
 <pre class="r"><code>print(paste(&quot;best lambda value is&quot;, as.character(lasso.fit$lambda.min)))</code></pre>
 <pre><code>## [1] &quot;best lambda value is 0.01&quot;</code></pre>
 <pre class="r"><code>best_lambda &lt;- lasso.fit$lambda.min</code></pre>
@@ -668,14 +667,14 @@ lasso.pred[predict(mod.lasso, newx = data.matrix(test_df[,-which(names(test_df) 
 (conf_mat_lasso &lt;- table(test_df$target, lasso.pred))</code></pre>
 <pre><code>##    lasso.pred
 ##          0      1
-##   0  42903  53273
-##   1  60807 265899</code></pre>
+##   0  21326  26620
+##   1  30379 133116</code></pre>
 <pre class="r"><code># accuracy
 (conf_mat_lasso[1,1]+conf_mat_lasso[2,2])/sum(conf_mat_lasso)</code></pre>
-<pre><code>## [1] 0.7302321</code></pre>
+<pre><code>## [1] 0.730426</code></pre>
 <pre class="r"><code># 1 - type 2 error
 conf_mat_lasso[1,1]/sum(conf_mat_lasso[1,])</code></pre>
-<pre><code>## [1] 0.4460884</code></pre>
+<pre><code>## [1] 0.4447921</code></pre>
 <p>The model performs slightly worse than our plain-vanilla logistic regression model. I suspect that is because overfitting is not a problem here in our model, so regularization is unnecessary.</p>
 <pre class="r"><code>lasso.train &lt;- rep(0, nrow(train_df))
 lasso.train[predict(mod.lasso, newx = data.matrix(train_df[,-which(names(train_df) %in% c(&quot;target&quot;))]), 
@@ -684,18 +683,18 @@ lasso.train[predict(mod.lasso, newx = data.matrix(train_df[,-which(names(train_d
 (conf_mat_lasso_train &lt;- table(train_df$target, lasso.train))</code></pre>
 <pre><code>##    lasso.train
 ##          0      1
-##   0  64065  79293
-##   1  91802 399161</code></pre>
+##   0  86038 105550
+##   1 123172 531002</code></pre>
 <pre class="r"><code># accuracy
 (conf_mat_lasso_train[1,1]+conf_mat_lasso_train[2,2])/sum(conf_mat_lasso_train)</code></pre>
-<pre><code>## [1] 0.7302706</code></pre>
+<pre><code>## [1] 0.7295669</code></pre>
 <pre class="r"><code># 1 - type 2 error
 conf_mat_lasso_train[1,1]/sum(conf_mat_lasso_train[1,])</code></pre>
-<pre><code>## [1] 0.4468882</code></pre>
+<pre><code>## [1] 0.4490782</code></pre>
 <pre class="r"><code>table(test_df$target)</code></pre>
 <pre><code>## 
 ##      0      1 
-##  96176 326706</code></pre>
+##  47946 163495</code></pre>
 <pre class="r"><code>#predict.glmnet()</code></pre>
 </div>
 

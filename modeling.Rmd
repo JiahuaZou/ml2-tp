@@ -27,7 +27,7 @@ cleaned_loan <- read.csv("cleaned_loan.csv")
 
 ```{r}
 
-trainprop <- 0.6
+trainprop <- 0.8
 size <- nrow(cleaned_loan)
 
 ```
@@ -51,7 +51,7 @@ colnames(train_df)
 ```
 
 ``` {r}
-glm.fit <- glm(target~., family = "binomial", data = train_df)
+glm.fit <- glm(target~.-X, family = "binomial", data = train_df)
 summary(glm.fit)
 
 ```
